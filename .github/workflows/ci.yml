@@ -2,8 +2,7 @@ name: CI
 on:
   push:
   pull_request:
-  schedule:
-  - cron:  '30 20 * * *'
+  workflow_dispatch:
 
 jobs:
   build-installer:
@@ -232,19 +231,6 @@ jobs:
           git clone --depth 1 https://github.com/ruby/mspec &&
           git clone --depth 1 https://github.com/ruby/spec &&
           env --unset=RUBYOPT ruby -C spec ../mspec/bin/mspec -I../../tool/lib -j
-        }
-
-    - name: Run the MRI copy of Ruby Spec Suite
-      shell: pwsh
-      run: |
-        # Actions uses UTF8, causes test failures, similar to normal OS setup
-        $PSDefaultParameterValues['*:Encoding'] = 'utf8'
-        [Console]::OutputEncoding = [System.Text.Encoding]::GetEncoding("IBM437")
-        [Console]::InputEncoding  = [System.Text.Encoding]::GetEncoding("IBM437")
-        ridk enable
-        if (-not ([string]::IsNullOrWhiteSpace($env:run_mri_spec))) {
-          git clone --depth 1 https://github.com/ruby/ruby -b $env:run_mri_spec &&
-          env --unset=RUBYOPT ruby -C ruby/spec/ruby ../mspec/bin/mspec -I../../tool/lib -j
         }
 
     - name: Verify that the used CA list is still the latest.
